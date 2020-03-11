@@ -3,7 +3,7 @@ import Recipient from '../models/Recipient';
 
 class RecipientController {
   /**
-   * Returns at least 20 recipients - Only Admins can execute this route
+   * Returns at least 20 entities - Only Admins can execute this route
    */
   async index(req, res) {
     if (!req.isAdmin) {
@@ -21,7 +21,7 @@ class RecipientController {
   }
 
   /**
-   * Create a recipient - Only Admins can execute this route
+   * Create an entity - Only Admins can execute this route
    */
   async store(req, res) {
     if (!req.isAdmin) {
@@ -69,7 +69,7 @@ class RecipientController {
   }
 
   /**
-   * Alter the data of a recipient - Only Admins can execute this route
+   * Alter the content of an entity - Only Admins can execute this route
    */
   async update(req, res) {
     if (!req.isAdmin) {
@@ -95,9 +95,7 @@ class RecipientController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { name, cep } = req.body;
-
-    const { street, number, complement, state, city } = req.body;
+    const { name, cep, street, number, complement, state, city } = req.body;
 
     const recipient = await Recipient.findOne({ where: { name, cep } });
 
@@ -135,7 +133,7 @@ class RecipientController {
   }
 
   /**
-   * Delete a recipient - Only Admins can execute this route
+   * Delete an entity - Only Admins can execute this route
    */
   async delete(req, res) {
     if (!req.isAdmin) {
