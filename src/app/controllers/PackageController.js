@@ -71,7 +71,7 @@ class PackageController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const [product, recipient_id, deliveryman_id] = req.body;
+    const { product, recipient_id, deliveryman_id } = req.body;
 
     // Check if the recipient exists
     const recipient = await Recipient.findByPk({ where: recipient_id });
@@ -129,7 +129,7 @@ class PackageController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const [
+    const {
       package_id,
       product = null,
       recipient_id = null,
@@ -137,7 +137,7 @@ class PackageController {
       canceled_at = null,
       start_date = null,
       end_date = null,
-    ] = req.body;
+    } = req.body;
 
     const packageData = await Package.findByPk({ where: { id: package_id } });
 
