@@ -78,5 +78,5 @@ Para testar a aplicação, será necessário realizar o clone do repositório e 
 Realize os testes através do Insomnia (certifique-se te tê-lo instalado em sua máquina):
 
 <div align="center">
-<a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend_2020-01-30.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
+<a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
 </div>
