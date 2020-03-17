@@ -73,6 +73,9 @@ O servidor já estará rodando, na URL http://localhost/3000
 Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado na máquina os seguintes bancos de dados:
 
 - Postgres
+- MongoDB
+- Redis
+
 > É possível utilizar o Docker para a conteinerização das imagens dos bancos de dados
 
 Realize os testes através do Insomnia (certifique-se te tê-lo instalado em sua máquina):
