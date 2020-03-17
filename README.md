@@ -20,6 +20,8 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 Atualmente o sistema conta com os seguintes bancos de dados:
 
 - Postgres
+- MongoDB
+- Redis
 
 <h2 align="center">
 	Ferramentas utilizadas
