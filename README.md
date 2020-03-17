@@ -10,7 +10,8 @@ Este repositório faz parte de uma aplicação completa (Back-end, Front-end e M
 
 Para saber mais sobre o projeto, acesse os links abaixo:
 
-- Etapa 1: "o início" / clique <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-02/blob/master/README.md#desafio-02-iniciando-aplica%C3%A7%C3%A3o">aqui</a> para saber mais sobre esta etapa
+- Etapa 1: "FastFeet, o início" / clique <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-02/blob/master/README.md#desafio-02-iniciando-aplica%C3%A7%C3%A3o">aqui</a> para saber mais sobre esta etapa
+- Etapa 2: "FastFeet, continuando a aplicação" / clique <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-03/blob/master/README.md#desafio-03-continuando-aplica%C3%A7%C3%A3o">aqui</a> para saber mais sobre esta etapa
 
 <h3 align="center">
   Banco de dados
@@ -19,6 +20,8 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 Atualmente o sistema conta com os seguintes bancos de dados:
 
 - Postgres
+- MongoDB
+- Redis
 
 <h2 align="center">
 	Ferramentas utilizadas
@@ -26,14 +29,17 @@ Atualmente o sistema conta com os seguintes bancos de dados:
 
 Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de desenvolvimento e outras para incorporar o projeto, são elas:
 
- - Express
- - Sucrase
- - Nodemon
- - ESLint
- - Prettier
- - Sequelize
  - Bcryptjs
- - JSONWebToken
+ - Bee-Queue
+ - Date-fns
+ - Dotenv
+ - Express
+ - JsonWebToken
+ - Mongoose
+ - Nodemailer
+ - Postgrees
+ - Sequelize
+ - Youch
  - YUP
 
 <h2 align="center">
@@ -69,10 +75,13 @@ O servidor já estará rodando, na URL http://localhost/3000
 Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado na máquina os seguintes bancos de dados:
 
 - Postgres
+- MongoDB
+- Redis
+
 > É possível utilizar o Docker para a conteinerização das imagens dos bancos de dados
 
 Realize os testes através do Insomnia (certifique-se te tê-lo instalado em sua máquina):
 
 <div align="center">
-<a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend_2020-01-30.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
+<a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
 </div>
