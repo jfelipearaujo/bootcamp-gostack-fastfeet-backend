@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Recipient from '../models/Recipient';
 
 class RecipientController {
@@ -10,11 +11,17 @@ class RecipientController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1 } = req.query;
+    const { page = 1, name = '' } = req.query;
 
     const recipients = await Recipient.findAll({
       limit: 20,
       offset: (page - 1) * 20,
+      attributes: ['id', 'name', 'address'],
+      where: {
+        name: {
+          [Op.iLike]: `%${name}%`,
+        },
+      },
     });
 
     return res.json(recipients);

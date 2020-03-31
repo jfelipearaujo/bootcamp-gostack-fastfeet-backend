@@ -151,4 +151,4 @@ class DeliveryProblemController {
   }
 }
 
-export default DeliveryProblemController();
+export default new DeliveryProblemController();

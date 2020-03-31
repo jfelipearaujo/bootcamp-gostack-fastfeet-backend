@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Package from '../models/Package';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
@@ -16,7 +17,7 @@ class PackageController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1 } = req.query;
+    const { page = 1, product = '' } = req.query;
 
     const packages = await Package.findAll({
       limit: 20,
@@ -48,6 +49,11 @@ class PackageController {
           attributes: ['name', 'path', 'url'],
         },
       ],
+      where: {
+        product: {
+          [Op.iLike]: `%${product}%`,
+        },
+      },
     });
 
     return res.json(packages);

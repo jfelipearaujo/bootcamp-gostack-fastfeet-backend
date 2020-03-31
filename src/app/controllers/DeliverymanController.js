@@ -1,5 +1,7 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Deliveryman from '../models/Deliveryman';
+import File from '../models/File';
 
 class DeliverymanController {
   /**
@@ -10,11 +12,24 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1 } = req.query;
+    const { page = 1, name = '' } = req.query;
 
     const deliverymen = await Deliveryman.findAll({
       limit: 20,
       offset: (page - 1) * 20,
+      attributes: ['id', 'name', 'email', 'avatar_id'],
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['name', 'path', 'url'],
+        },
+      ],
+      where: {
+        name: {
+          [Op.iLike]: `%${name}%`,
+        },
+      },
     });
 
     return res.json(deliverymen);
