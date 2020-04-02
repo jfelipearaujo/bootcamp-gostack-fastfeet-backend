@@ -11,33 +11,55 @@ import PackageController from './app/controllers/PackageController';
 import DeliveryController from './app/controllers/DeliveryController';
 import DeliveryProblemController from './app/controllers/DeliveryProblemController';
 
+import validateUserStore from './app/validators/UserStore';
+import validateUserUpdate from './app/validators/UserUpdate';
+
+import validateSessionStore from './app/validators/SessionStore';
+
+import validateDeliverymanStore from './app/validators/DeliverymanStore';
+import validateDeliverymanUpdate from './app/validators/DeliverymanUpdate';
+
+import validatePackageStore from './app/validators/PackageStore';
+import validatePackageUpdate from './app/validators/PackageUpdate';
+
+import validateRecipientStore from './app/validators/RecipientStore';
+import validateRecipientUpdate from './app/validators/RecipientUpdate';
+
 import authMiddleware from './app/middlewares/auth';
 
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.post('/users', UserController.store);
-routes.post('/sessions', SessionController.store);
+routes.post('/users', validateUserStore, UserController.store);
+routes.post('/sessions', validateSessionStore, SessionController.store);
 
 routes.use(authMiddleware);
 
 routes.get('/users', UserController.index);
-routes.put('/users', UserController.update);
+routes.put('/users', validateUserUpdate, UserController.update);
 routes.delete('/users', UserController.delete);
 
 routes.get('/recipients', RecipientController.index);
-routes.post('/recipients', RecipientController.store);
-routes.put('/recipients', RecipientController.update);
+routes.post('/recipients', validateRecipientStore, RecipientController.store);
+routes.put('/recipients', validateRecipientUpdate, RecipientController.update);
 routes.delete('/recipients', RecipientController.delete);
 
 routes.get('/deliverymen', DeliverymanController.index);
-routes.post('/deliverymen', DeliverymanController.store);
-routes.put('/deliverymen', DeliverymanController.update);
+routes.post(
+  '/deliverymen',
+  validateDeliverymanStore,
+  DeliverymanController.store
+);
+routes.put(
+  '/deliverymen',
+  validateDeliverymanUpdate,
+  DeliverymanController.update
+);
 routes.delete('/deliverymen', DeliverymanController.delete);
 
 routes.get('/packages', PackageController.index);
-routes.post('/packages', PackageController.store);
-routes.put('/packages', PackageController.update);
+routes.post('/packages', validatePackageStore, PackageController.store);
+routes.put('/packages', validatePackageUpdate, PackageController.update);
 routes.delete('/packages', PackageController.delete);
 
 routes.get('/deliveryman/:deliverymanId/deliveries', DeliveryController.index);

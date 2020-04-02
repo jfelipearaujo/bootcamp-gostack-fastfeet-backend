@@ -5,7 +5,7 @@ module.exports = {
       references: { model: 'deliverymans', key: 'id' },
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
-      allowNull: false,
+      allowNull: true,
     });
   },
 

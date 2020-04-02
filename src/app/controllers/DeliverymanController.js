@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { Op } from 'sequelize';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
@@ -43,17 +42,6 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string()
-        .email()
-        .required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     const { email } = req.body;
 
     const deliverymen = await Deliveryman.findOne({ where: { email } });
@@ -73,17 +61,6 @@ class DeliverymanController {
   async update(req, res) {
     if (!req.isAdmin) {
       return res.status(401).json({ error: 'Access denied' });
-    }
-
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string()
-        .email()
-        .required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
     }
 
     const { name, email } = req.body;

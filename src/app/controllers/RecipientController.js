@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { Op } from 'sequelize';
 import Recipient from '../models/Recipient';
 
@@ -35,26 +34,6 @@ class RecipientController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      street: Yup.string().required(),
-      number: Yup.number().required(),
-      complement: Yup.string(),
-      state: Yup.string()
-        .required()
-        .min(2)
-        .max(2),
-      city: Yup.string().required(),
-      cep: Yup.string()
-        .required()
-        .min(8)
-        .max(8),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     const { name, cep } = req.body;
 
     const recipientExists = await Recipient.findOne({ where: { name, cep } });
@@ -81,25 +60,6 @@ class RecipientController {
   async update(req, res) {
     if (!req.isAdmin) {
       return res.status(401).json({ error: 'Access denied' });
-    }
-
-    const schema = Yup.object().shape({
-      name: Yup.string(),
-      street: Yup.string(),
-      number: Yup.number(),
-      complement: Yup.string(),
-      state: Yup.string()
-        .min(2)
-        .max(2),
-      city: Yup.string(),
-      cep: Yup.string()
-        .required()
-        .min(8)
-        .max(8),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
     }
 
     const { name, cep, street, number, complement, state, city } = req.body;

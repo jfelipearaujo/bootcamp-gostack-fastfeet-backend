@@ -1,4 +1,3 @@
-import * as Yup from 'yup';
 import { Op } from 'sequelize';
 import Package from '../models/Package';
 import Recipient from '../models/Recipient';
@@ -67,16 +66,6 @@ class PackageController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const schema = Yup.object().shape({
-      product: Yup.string().required(),
-      recipient_id: Yup.number().required(),
-      deliveryman_id: Yup.number().required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     const { product, recipient_id, deliveryman_id } = req.body;
 
     // Check if the recipient exists
@@ -117,22 +106,6 @@ class PackageController {
   async update(req, res) {
     if (!req.isAdmin) {
       return res.status(401).json({ error: 'Access denied' });
-    }
-
-    const schema = Yup.object().shape({
-      package_id: Yup()
-        .number()
-        .required(),
-      product: Yup.string(),
-      recipient_id: Yup.number(),
-      deliveryman_id: Yup.number(),
-      canceled_at: Yup().Date(),
-      start_date: Yup().Date(),
-      end_date: Yup().Date(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
     }
 
     const {
