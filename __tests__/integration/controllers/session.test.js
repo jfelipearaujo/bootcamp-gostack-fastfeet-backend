@@ -4,7 +4,7 @@ import truncate from '../../util/truncate';
 
 describe('Session', () => {
   beforeEach(async () => {
-    await truncate();
+    await truncate('User');
   });
 
   it('should return validation error', async () => {

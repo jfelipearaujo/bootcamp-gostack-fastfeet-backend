@@ -1,9 +1,11 @@
 import { Op } from 'sequelize';
 import database from '../../src/database';
 
-export default function truncate() {
+export default function truncate(model) {
   return Promise.all(
     Object.keys(database.connection.models).map(key => {
+      if (key !== model) return {};
+
       if (key === 'User') {
         return database.connection.models[key].destroy({
           where: {

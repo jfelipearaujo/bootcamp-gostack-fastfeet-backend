@@ -41,8 +41,12 @@ routes.delete('/users', UserController.delete);
 
 routes.get('/recipients', RecipientController.index);
 routes.post('/recipients', validateRecipientStore, RecipientController.store);
-routes.put('/recipients', validateRecipientUpdate, RecipientController.update);
-routes.delete('/recipients', RecipientController.delete);
+routes.put(
+  '/recipients/:id',
+  validateRecipientUpdate,
+  RecipientController.update
+);
+routes.delete('/recipients/:id', RecipientController.delete);
 
 routes.get('/deliverymen', DeliverymanController.index);
 routes.post(

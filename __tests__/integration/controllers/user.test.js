@@ -33,7 +33,7 @@ describe('User', () => {
   });
 
   beforeEach(async () => {
-    await truncate();
+    await truncate('User');
   });
 
   it('should encrypt user password when new user is created', async () => {

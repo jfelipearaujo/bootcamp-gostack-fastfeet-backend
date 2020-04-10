@@ -12,15 +12,35 @@ class RecipientController {
 
     const { page = 1, name = '' } = req.query;
 
-    const recipients = await Recipient.findAll({
-      limit: 20,
-      offset: (page - 1) * 20,
-      attributes: ['id', 'name', 'address'],
-      where: {
+    let whereConditional;
+
+    if (process.env.NODE_ENV === 'test') {
+      whereConditional = {
+        name: {
+          [Op.like]: `%${name}%`,
+        },
+      };
+    } else {
+      whereConditional = {
         name: {
           [Op.iLike]: `%${name}%`,
         },
-      },
+      };
+    }
+
+    const recipients = await Recipient.findAll({
+      limit: 20,
+      offset: (page - 1) * 20,
+      attributes: [
+        'id',
+        'name',
+        'street',
+        'number',
+        'city',
+        'state',
+        'address',
+      ],
+      where: whereConditional,
     });
 
     return res.json(recipients);
@@ -51,7 +71,7 @@ class RecipientController {
       city,
     } = await Recipient.create(req.body);
 
-    return res.json({ id, street, number, complement, state, city, cep });
+    return res.json({ id, name, street, number, complement, state, city, cep });
   }
 
   /**
@@ -62,13 +82,15 @@ class RecipientController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { name, cep, street, number, complement, state, city } = req.body;
+    const { id } = req.params;
 
-    const recipient = await Recipient.findOne({ where: { name, cep } });
+    const recipient = await Recipient.findByPk(id);
 
     if (!recipient) {
-      return res.status(404).json({ error: 'Recipient not found' });
+      return res.status(404).json({ error: `Recipient not found ${id}` });
     }
+
+    const { name, cep, street, number, complement, state, city } = req.body;
 
     /**
      * Validate if the recipient wants to change the name, if yes: check if exists
@@ -107,19 +129,15 @@ class RecipientController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { recipient_id } = req.body;
+    const { id } = req.params;
 
-    if (!recipient_id) {
-      return res.status(400).json({ error: 'Recipient id not provided' });
-    }
-
-    const recipient = await Recipient.findByPk(recipient_id);
+    const recipient = await Recipient.findByPk(id);
 
     if (!recipient) {
       return res.status(404).json({ error: 'Recipient not found' });
     }
 
-    await Recipient.destroy({ where: { id: recipient_id } });
+    await Recipient.destroy({ where: { id } });
 
     return res.json({ ok: 'Recipient deleted' });
   }
