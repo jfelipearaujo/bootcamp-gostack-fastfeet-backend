@@ -7,6 +7,30 @@ import Package from '../models/Package';
 
 class StartDeliveryService {
   async run({ deliveryman_id, package_id }) {
+    if (!deliveryman_id) {
+      throw new Error('Deliveryman Id not provided');
+    }
+
+    if (!package_id) {
+      throw new Error('Package Id not provided');
+    }
+
+    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
+
+    if (!deliveryman) {
+      throw new Error('Deliveryman not found');
+    }
+
+    const packageData = await Package.findByPk(package_id);
+
+    if (!packageData) {
+      throw new Error('Package not found');
+    }
+
+    if (packageData.start_date !== null) {
+      throw new Error('Delivery already started');
+    }
+
     const today = new Date();
     const todayStartDay = setSeconds(setMinutes(setHours(today, 0), 0), 0);
     const todayStart = setSeconds(setMinutes(setHours(today, 8), 0), 0);
@@ -14,16 +38,6 @@ class StartDeliveryService {
 
     if (isBefore(today, todayStart) || isAfter(today, todayEnd)) {
       throw new Error('A delivery can only start between 08:00 and 18:00');
-    }
-
-    if (!deliveryman_id) {
-      throw new Error('Deliveryman Id not provided');
-    }
-
-    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
-
-    if (!deliveryman) {
-      throw new Error('Deliveryman not found');
     }
 
     const countOfDayDeliveries = await Package.count({
@@ -37,16 +51,6 @@ class StartDeliveryService {
 
     if (countOfDayDeliveries >= 5) {
       throw new Error('Only 5 deliveries per day are allowed');
-    }
-
-    const packageData = await Package.findByPk(package_id);
-
-    if (!packageData) {
-      throw new Error('Package not found');
-    }
-
-    if (packageData.start_date !== null) {
-      throw new Error('Delivery already started');
     }
 
     packageData.start_date = new Date();

@@ -7,6 +7,16 @@ describe('Session', () => {
     await truncate();
   });
 
+  it('should return validation error', async () => {
+    const response = await request(app)
+      .post('/sessions')
+      .send({
+        email: 'naoexiste@email.com',
+      });
+
+    expect(response.status).toBe(400);
+  });
+
   it('should return error if user is not found', async () => {
     const response = await request(app)
       .post('/sessions')

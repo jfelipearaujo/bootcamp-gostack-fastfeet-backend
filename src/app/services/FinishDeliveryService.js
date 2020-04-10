@@ -8,6 +8,14 @@ class FinishDeliveryService {
       throw new Error('Deliveryman Id not provided');
     }
 
+    if (!signature_id) {
+      throw new Error('Signature Id not provided');
+    }
+
+    if (!package_id) {
+      throw new Error('Package Id not provided');
+    }
+
     const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
     if (!deliveryman) {

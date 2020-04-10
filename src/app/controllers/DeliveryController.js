@@ -88,12 +88,16 @@ class DeliveryController {
     const { deliveryman_id } = req.params.deliverymanId;
     const { package_id } = req.body;
 
-    const packageData = await StartDeliveryService.run({
-      deliveryman_id,
-      package_id,
-    });
+    try {
+      const packageData = await StartDeliveryService.run({
+        deliveryman_id,
+        package_id,
+      });
 
-    return res.json(packageData);
+      return res.json(packageData);
+    } catch (err) {
+      return res.status(400).json({ error: err });
+    }
   }
 
   /**
@@ -103,13 +107,17 @@ class DeliveryController {
     const { deliveryman_id } = req.params.deliverymanId;
     const { package_id, signature_id } = req.body;
 
-    const packageData = await FinishDeliveryService.run({
-      deliveryman_id,
-      signature_id,
-      package_id,
-    });
+    try {
+      const packageData = await FinishDeliveryService.run({
+        deliveryman_id,
+        signature_id,
+        package_id,
+      });
 
-    return res.json(packageData);
+      return res.json(packageData);
+    } catch (err) {
+      return res.status(400).json({ error: err });
+    }
   }
 }
 

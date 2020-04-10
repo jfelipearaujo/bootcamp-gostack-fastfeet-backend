@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">29.03% </span>
+                <span class="strong">27.27% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/31</span>
+                <span class='fraction'>9/33</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.67% </span>
+                <span class="strong">15% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/18</span>
+                <span class='fraction'>3/20</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.52% </span>
+                <span class="strong">17.24% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/27</span>
+                <span class='fraction'>5/29</span>
             </div>
         
             
@@ -117,7 +117,11 @@
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
 <a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -128,11 +132,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -147,11 +146,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -159,9 +155,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -186,6 +194,30 @@ import Package from '../models/Package';
 &nbsp;
 class StartDeliveryService {
 <span class="fstat-no" title="function not covered" >  as</span>ync run({ deliveryman_id, package_id }) {
+<span class="cstat-no" title="statement not covered" >    if (!deliveryman_id) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Deliveryman Id not provided');</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!package_id) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Package Id not provided');</span>
+    }
+&nbsp;
+    const deliveryman = <span class="cstat-no" title="statement not covered" >await Deliveryman.findByPk(deliveryman_id);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!deliveryman) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Deliveryman not found');</span>
+    }
+&nbsp;
+    const packageData = <span class="cstat-no" title="statement not covered" >await Package.findByPk(package_id);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!packageData) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Package not found');</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (packageData.start_date !== null) {</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error('Delivery already started');</span>
+    }
+&nbsp;
     const today = <span class="cstat-no" title="statement not covered" >new Date();</span>
     const todayStartDay = <span class="cstat-no" title="statement not covered" >setSeconds(setMinutes(setHours(today, 0), 0), 0);</span>
     const todayStart = <span class="cstat-no" title="statement not covered" >setSeconds(setMinutes(setHours(today, 8), 0), 0);</span>
@@ -193,16 +225,6 @@ class StartDeliveryService {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (isBefore(today, todayStart) || isAfter(today, todayEnd)) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('A delivery can only start between 08:00 and 18:00');</span>
-    }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!deliveryman_id) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('Deliveryman Id not provided');</span>
-    }
-&nbsp;
-    const deliveryman = <span class="cstat-no" title="statement not covered" >await Deliveryman.findByPk(deliveryman_id);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!deliveryman) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('Deliveryman not found');</span>
     }
 &nbsp;
     const countOfDayDeliveries = <span class="cstat-no" title="statement not covered" >await Package.count({</span>
@@ -216,16 +238,6 @@ class StartDeliveryService {
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (countOfDayDeliveries &gt;= 5) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error('Only 5 deliveries per day are allowed');</span>
-    }
-&nbsp;
-    const packageData = <span class="cstat-no" title="statement not covered" >await Package.findByPk(package_id);</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!packageData) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('Package not found');</span>
-    }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >    if (packageData.start_date !== null) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('Delivery already started');</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    packageData.start_date = new Date();</span>
@@ -244,7 +256,7 @@ export default new StartDeliveryService();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Apr 09 2020 22:35:32 GMT-0300 (GMT-03:00)
+                at Thu Apr 09 2020 23:45:52 GMT-0300 (GMT-03:00)
             </div>
         </div>
         <script src="../prettify.js"></script>

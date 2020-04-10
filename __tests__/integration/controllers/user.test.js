@@ -46,6 +46,17 @@ describe('User', () => {
     expect(compareHash).toBeTruthy();
   });
 
+  it('should return validtion error when try to create an user', async () => {
+    const response = await request(app)
+      .post('/users')
+      .send({
+        name: 'Teste',
+        email: 'email@email.com',
+      });
+
+    expect(response.status).toBe(400);
+  });
+
   it('should be able to register', async () => {
     const user = await factory.attrs('User');
 
@@ -136,6 +147,22 @@ describe('User', () => {
     expect(response.body.name).toBe(expectedUserName);
   });
 
+  it('should return validtion error when try to update an user', async () => {
+    const expectedUserName = 'Jose Felipe';
+
+    const response = await request(app)
+      .put('/users')
+      .send({
+        name: expectedUserName,
+        email: 'jose@email.com',
+        oldPassword: '123456',
+        password: '12345678',
+      })
+      .set('Authorization', `Bearer ${commonToken}`);
+
+    expect(response.status).toBe(400);
+  });
+
   it('should not be able to update an user with an existing email', async () => {
     const response = await request(app)
       .put('/users')
@@ -149,7 +176,7 @@ describe('User', () => {
     expect(response.status).toBe(400);
   });
 
-  it('should not be able to update an user with an incorrect password', async () => {
+  it('should not be able to update an user with an incorrect old password', async () => {
     const response = await request(app)
       .put('/users')
       .send({
@@ -161,6 +188,20 @@ describe('User', () => {
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
+  });
+
+  it('should not be able to update an user with an incorrect new password', async () => {
+    const response = await request(app)
+      .put('/users')
+      .send({
+        email: 'jose@email.com',
+        oldPassword: '123456',
+        password: '123456',
+        confirmPassword: '12345678',
+      })
+      .set('Authorization', `Bearer ${commonToken}`);
+
+    expect(response.status).toBe(400);
   });
 
   it('should not be able to access the delete route if isnt an admin', async () => {
@@ -219,5 +260,26 @@ describe('User', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(deleteResponse.status).toBe(200);
+  });
+
+  it('should return error when token is not provided', async () => {
+    const response = await request(app)
+      .delete('/users')
+      .send({
+        user_id: 1,
+      });
+
+    expect(response.status).toBe(401);
+  });
+
+  it('should return error when token is invalid', async () => {
+    const response = await request(app)
+      .delete('/users')
+      .send({
+        user_id: 1,
+      })
+      .set('Authorization', `Bearer ${`${adminToken}aa`}`);
+
+    expect(response.status).toBe(401);
   });
 });
