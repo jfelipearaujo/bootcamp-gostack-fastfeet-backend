@@ -1,9 +1,6 @@
 import User from '../models/User';
 
 class UserController {
-  /**
-   * Returns at least 20 users - Only Admins can execute this route
-   */
   async index(req, res) {
     if (!req.isAdmin) {
       return res.status(401).json({ error: 'Access denied' });
@@ -19,9 +16,6 @@ class UserController {
     return res.json(users);
   }
 
-  /**
-   * Create a user - Everyone can execute this route
-   */
   async store(req, res) {
     const userExists = await User.findOne({
       where: { email: req.body.email },
@@ -36,9 +30,6 @@ class UserController {
     return res.json({ id, name, email, is_admin });
   }
 
-  /**
-   * Alter the data of an user - Everyone can execute this route
-   */
   async update(req, res) {
     const { email, oldPassword } = req.body;
 
@@ -48,7 +39,7 @@ class UserController {
      * Validate if the users wants to change their email, if yes: check if exists
      */
     if (email && email !== user.email) {
-      const userExists = await User.findOne({ where: email });
+      const userExists = await User.findOne({ where: { email } });
 
       if (userExists) {
         return res.status(400).json({ error: 'E-mail already exists' });
@@ -62,14 +53,11 @@ class UserController {
       return res.status(401).json({ error: 'The old password is invalid' });
     }
 
-    const { id, name, is_admin } = await User.update(req.body);
+    const { id, name, is_admin } = await user.update(req.body);
 
     return res.json({ id, name, email, is_admin });
   }
 
-  /**
-   * Delete a user - Only Admins can execute this route
-   */
   async delete(req, res) {
     if (!req.isAdmin) {
       return res.status(401).json({ error: 'Access denied' });

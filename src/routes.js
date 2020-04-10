@@ -35,8 +35,8 @@ routes.post('/sessions', validateSessionStore, SessionController.store);
 
 routes.use(authMiddleware);
 
-routes.get('/users', UserController.index);
 routes.put('/users', validateUserUpdate, UserController.update);
+routes.get('/users', UserController.index);
 routes.delete('/users', UserController.delete);
 
 routes.get('/recipients', RecipientController.index);
