@@ -42,7 +42,7 @@ Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de d
  - YUP
 
 <h2 align="center">
-	Executando o server
+	Executando a API
 </h2>
 
 Para executar o projeto basta clonar este repositório e abrir o PowerShell (ou outro terminal) na pasta raiz, feito isso execute o seguinte comando:
