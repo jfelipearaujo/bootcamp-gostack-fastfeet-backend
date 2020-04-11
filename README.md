@@ -81,7 +81,7 @@ O servidor já estará rodando, na URL http://localhost/3000
 	Testes automatizados
 </h2>
 
-A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo segue o gráfico do codecoverage gerado pelo Jest:
+A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo segue o gráfico do _codecoverage_ gerado pelo Jest:
 
 <p align="center">
 <img src="https://user-images.githubusercontent.com/7776944/79054712-9261cc00-7c1d-11ea-82fc-736f7bbe571d.png"/>
