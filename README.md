@@ -87,6 +87,8 @@ A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo s
 <img src="https://user-images.githubusercontent.com/7776944/79054712-9261cc00-7c1d-11ea-82fc-736f7bbe571d.png"/>
 </p>
 
+Para mais detalhes sobre os resultados dos testes, clique [aqui](https://htmlpreview.github.io/?https://github.com/jfelipearaujo/bootcamp-gostack-fastfeet-backend/blob/master/__tests__/coverage/lcov-report/index.html)
+
 <h2 align="center">
 	Testando a aplicação
 </h2>
