@@ -48,18 +48,18 @@ routes.put(
 );
 routes.delete('/recipients/:id', RecipientController.delete);
 
-routes.get('/deliverymen', DeliverymanController.index);
+routes.get('/deliveryman', DeliverymanController.index);
 routes.post(
-  '/deliverymen',
+  '/deliveryman',
   validateDeliverymanStore,
   DeliverymanController.store
 );
 routes.put(
-  '/deliverymen',
+  '/deliveryman/:id',
   validateDeliverymanUpdate,
   DeliverymanController.update
 );
-routes.delete('/deliverymen', DeliverymanController.delete);
+routes.delete('/deliveryman/:id', DeliverymanController.delete);
 
 routes.get('/packages', PackageController.index);
 routes.post('/packages', validatePackageStore, PackageController.store);

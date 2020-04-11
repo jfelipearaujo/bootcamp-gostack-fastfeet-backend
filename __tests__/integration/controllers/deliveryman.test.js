@@ -4,7 +4,7 @@ import app from '../../../src/app';
 import factory from '../../factories';
 import truncate from '../../util/truncate';
 
-describe('Recipient', () => {
+describe('Deliveryman', () => {
   let adminToken;
   let commonToken;
 
@@ -31,34 +31,34 @@ describe('Recipient', () => {
   });
 
   beforeEach(async () => {
-    await truncate('Recipient');
+    await truncate('Deliveryman');
   });
 
   it('should not allow to access a restricted get route', async () => {
     const response = await request(app)
-      .get('/recipients')
+      .get('/deliveryman')
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
   });
 
   it('should not allow to access a restricted post route', async () => {
-    const recipient = await factory.attrs('Recipient');
+    const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
   });
 
   it('should not allow to access a restricted put route', async () => {
-    const recipient = await factory.attrs('Recipient');
+    const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .put('/recipients/1')
-      .send(recipient)
+      .put('/deliveryman/1')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
@@ -66,65 +66,90 @@ describe('Recipient', () => {
 
   it('should not allow to access a restricted delete route', async () => {
     const response = await request(app)
-      .delete('/recipients/1')
+      .delete('/deliveryman/1')
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
   });
 
-  it('should create a recipient', async () => {
-    const recipient = await factory.attrs('Recipient');
+  it('should create a deliveryman', async () => {
+    const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.body).toHaveProperty('id');
   });
 
-  it('should not create a recipient with same name and cep', async () => {
-    let recipient = await factory.attrs('Recipient');
+  it('should not create a deliveryman with an email thats already exists', async () => {
+    let deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
 
-    const { name, cep } = response.body;
+    const { email } = response.body;
 
-    recipient = await factory.attrs('Recipient', {
-      name,
-      cep,
+    deliveryman = await factory.attrs('Deliveryman', {
+      email,
     });
 
     response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(400);
   });
 
-  it('should not update a not recipient thats not exists', async () => {
-    const recipient = await factory.attrs('Recipient');
+  it('should update a deliveryman', async () => {
+    let deliveryman = await factory.attrs('Deliveryman');
+
+    let response = await request(app)
+      .post('/deliveryman')
+      .send(deliveryman)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const { id, email } = response.body;
+
+    deliveryman = await factory.attrs('Deliveryman', {
+      email,
+    });
+
+    response = await request(app)
+      .put(`/deliveryman/${id}`)
+      .send(deliveryman)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+  });
+
+  it('should not update a deliveryman thats not exists', async () => {
+    const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .put('/recipients')
-      .send(recipient)
+      .put('/deliveryman/9999')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(404);
   });
 
-  it('should not update a recipient with name and cep thats already exists', async () => {
-    let recipient = await factory.attrs('Recipient');
+  it('should not update a deliveryman with email thats already exists', async () => {
+    let deliveryman = await factory.attrs('Deliveryman', {
+      email: 'jose@email.com',
+    });
 
     let response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
@@ -133,70 +158,35 @@ describe('Recipient', () => {
 
     //------
 
-    recipient = await factory.attrs('Recipient');
+    deliveryman = await factory.attrs('Deliveryman', {
+      email: 'felipe@email.com',
+    });
 
     response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
 
-    const { name, cep } = response.body;
+    const { email } = response.body;
 
     response = await request(app)
-      .put(`/recipients/${id}`)
+      .put(`/deliveryman/${id}`)
       .send({
-        name,
-        cep,
+        email,
       })
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(400);
   });
 
-  it('should update a recipient', async () => {
-    const recipient = await factory.attrs('Recipient');
+  it('should delete a deliveryman', async () => {
+    const deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/recipients')
-      .send(recipient)
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const { id, name, cep } = response.body;
-
-    const newRecipient = await factory.attrs('Recipient', {
-      name,
-      cep,
-    });
-
-    response = await request(app)
-      .put(`/recipients/${id}`)
-      .send(newRecipient)
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-  });
-
-  it('should return an error if the recipient is not found when try to update', async () => {
-    const recipient = await factory.attrs('Recipient');
-
-    const response = await request(app)
-      .put(`/recipients/${9999}`)
-      .send(recipient)
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(404);
-  });
-
-  it('should delete a recipient', async () => {
-    const recipient = await factory.attrs('Recipient');
-
-    let response = await request(app)
-      .post('/recipients')
-      .send(recipient)
+      .post('/deliveryman')
+      .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
@@ -204,39 +194,39 @@ describe('Recipient', () => {
     const { id } = response.body;
 
     response = await request(app)
-      .delete(`/recipients/${id}`)
+      .delete(`/deliveryman/${id}`)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
   });
 
-  it('should return an error if the recipient is not found when try to delete', async () => {
+  it('should not delete a deliveryman thats not exists', async () => {
     const response = await request(app)
-      .delete(`/recipients/${9999}`)
+      .delete('/deliveryman/9999')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(404);
   });
 
-  it('should return max 20 recipients', async () => {
-    const expectedRecipientCount = 20;
-    const numOfRecipients = 30;
-    const recipients = await factory.attrsMany('Recipient', numOfRecipients);
+  it('should return max 20 deliveryman', async () => {
+    const expectedCount = 20;
+    const numOfEntities = 30;
+    const deliverymans = await factory.attrsMany('Deliveryman', numOfEntities);
 
-    const promises = recipients.map(async recipient => {
+    const promises = deliverymans.map(async entity => {
       await request(app)
-        .post('/recipients')
-        .send(recipient)
+        .post('/deliveryman')
+        .send(entity)
         .set('Authorization', `Bearer ${adminToken}`);
     });
 
     await Promise.all(promises);
 
     const response = await request(app)
-      .get('/recipients')
+      .get('/deliveryman')
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.length).toBe(expectedRecipientCount);
+    expect(response.body.length).toBe(expectedCount);
   });
 });

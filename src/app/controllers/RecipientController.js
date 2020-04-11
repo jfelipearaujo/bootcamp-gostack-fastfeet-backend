@@ -10,20 +10,20 @@ class RecipientController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1, name = '' } = req.query;
+    const { page = 1, n = '' } = req.query;
 
     let whereConditional;
 
     if (process.env.NODE_ENV === 'test') {
       whereConditional = {
         name: {
-          [Op.like]: `%${name}%`,
+          [Op.like]: `%${n}%`, // SQLite doesnt contains the 'iLike'
         },
       };
     } else {
       whereConditional = {
         name: {
-          [Op.iLike]: `%${name}%`,
+          [Op.iLike]: `%${n}%`,
         },
       };
     }
@@ -43,7 +43,7 @@ class RecipientController {
       where: whereConditional,
     });
 
-    return res.json(recipients);
+    return res.status(200).json(recipients);
   }
 
   /**

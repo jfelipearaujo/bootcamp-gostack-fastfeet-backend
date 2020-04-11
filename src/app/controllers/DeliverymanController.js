@@ -11,7 +11,23 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1, name = '' } = req.query;
+    const { page = 1, n = '' } = req.query;
+
+    let whereConditional;
+
+    if (process.env.NODE_ENV === 'test') {
+      whereConditional = {
+        name: {
+          [Op.like]: `%${n}%`, // SQLite doesnt contains the 'iLike'
+        },
+      };
+    } else {
+      whereConditional = {
+        name: {
+          [Op.iLike]: `%${n}%`,
+        },
+      };
+    }
 
     const deliverymen = await Deliveryman.findAll({
       limit: 20,
@@ -24,11 +40,7 @@ class DeliverymanController {
           attributes: ['name', 'path', 'url'],
         },
       ],
-      where: {
-        name: {
-          [Op.iLike]: `%${name}%`,
-        },
-      },
+      where: whereConditional,
     });
 
     return res.json(deliverymen);
@@ -42,7 +54,7 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { email } = req.body;
+    const { name, email } = req.body;
 
     const deliverymen = await Deliveryman.findOne({ where: { email } });
 
@@ -50,7 +62,7 @@ class DeliverymanController {
       return res.status(400).json({ error: 'E-mail already exists' });
     }
 
-    const { id, name } = await Deliveryman.create(req.body);
+    const { id } = await Deliveryman.create(req.body);
 
     return res.json({ id, name, email });
   }
@@ -63,9 +75,10 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { name, email } = req.body;
+    const { id } = req.params;
+    const { email } = req.body;
 
-    const deliveryman = await Deliveryman.findOne({ where: { email } });
+    const deliveryman = await Deliveryman.findByPk(id);
 
     if (!deliveryman) {
       return res.status(404).json({ error: 'Deliveryman not found' });
@@ -74,10 +87,7 @@ class DeliverymanController {
     /**
      * Validate if the deliveryman wants to change the name, if yes: check if exists
      */
-    if (
-      (name && name !== deliveryman.name) ||
-      (email && email !== deliveryman.email)
-    ) {
+    if (email && email !== deliveryman.email) {
       const deliverymanExists = await Deliveryman.findOne({
         where: { email },
       });
@@ -87,15 +97,19 @@ class DeliverymanController {
       }
     }
 
-    await Deliveryman.update(req.body, {
-      where: { id: deliveryman.id },
+    await deliveryman.update(req.body);
+
+    const { name, avatar } = await Deliveryman.findByPk(id, {
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
     });
 
-    return res.json({
-      id: deliveryman.id,
-      name,
-      email,
-    });
+    return res.json({ id, name, email, avatar });
   }
 
   /**
@@ -106,19 +120,15 @@ class DeliverymanController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { deliveryman_id } = req.body;
+    const { id } = req.params;
 
-    if (!deliveryman_id) {
-      return res.status(400).json({ error: 'Deliveryman id not provided' });
-    }
-
-    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
+    const deliveryman = await Deliveryman.findByPk(id);
 
     if (!deliveryman) {
-      return res.status(404).json({ error: 'Recipient not found' });
+      return res.status(404).json({ error: 'Deliveryman not found' });
     }
 
-    await Deliveryman.destroy({ where: { id: deliveryman_id } });
+    await Deliveryman.destroy({ where: { id } });
 
     return res.json({ ok: 'Deliveryman deleted' });
   }
