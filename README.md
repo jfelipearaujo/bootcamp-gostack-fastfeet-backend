@@ -20,7 +20,6 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 Atualmente o sistema conta com os seguintes bancos de dados:
 
 - Postgres
-- MongoDB
 - Redis
 
 <h2 align="center">
@@ -63,24 +62,18 @@ yarn dev
 O servidor já estará rodando, na URL http://localhost/3000
 
 <h2 align="center">
-	Middlewares
-</h2>
-
-- Validador verificando se existe um token no header das requisições e se o mesmo é válido
-
-<h2 align="center">
 	Testando a aplicação
 </h2>
 
-Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado na máquina os seguintes bancos de dados:
+Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado em sua máquina os seguintes bancos de dados:
 
 - Postgres
-- MongoDB
 - Redis
 
 > É possível utilizar o Docker para a conteinerização das imagens dos bancos de dados
+> Lembre-se de modificar o arquivo de variáveis de ambiente
 
-Realize os testes através do Insomnia (certifique-se te tê-lo instalado em sua máquina):
+Realize os testes através do Insomnia com o link abaixo:
 
 <div align="center">
 <a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
