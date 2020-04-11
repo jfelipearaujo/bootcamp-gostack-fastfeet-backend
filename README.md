@@ -26,20 +26,36 @@ Atualmente o sistema conta com os seguintes bancos de dados:
 	Ferramentas utilizadas
 </h2>
 
-Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de desenvolvimento e outras para incorporar o projeto, são elas:
+Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de desenvolvimento, são elas:
+
+> Dependências
 
  - Bcryptjs
  - Bee-Queue
+ - Cors
  - Date-fns
  - Dotenv
  - Express
  - JsonWebToken
- - Mongoose
  - Nodemailer
+ - Multer
  - Postgrees
  - Sequelize
+ - Sentry
  - Youch
  - YUP
+ 
+> Dependências de desenvolvimento
+
+ - ESLint
+ - Factory Gril
+ - Faker
+ - Jest
+ - Nodemon
+ - Prettier
+ - Sucrase
+ - Supertest
+ - SQLite 
 
 <h2 align="center">
 	Executando a API
@@ -60,6 +76,16 @@ yarn dev
 ```
 
 O servidor já estará rodando, na URL http://localhost/3000
+
+<h2 align="center">
+	Testes automatizados
+</h2>
+
+A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo segue o gráfico do codecoverage gerado pelo Jest:
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/7776944/79054712-9261cc00-7c1d-11ea-82fc-736f7bbe571d.png"/>
+</p>
 
 <h2 align="center">
 	Testando a aplicação
