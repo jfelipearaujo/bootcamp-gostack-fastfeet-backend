@@ -20,30 +20,45 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 Atualmente o sistema conta com os seguintes bancos de dados:
 
 - Postgres
-- MongoDB
 - Redis
 
 <h2 align="center">
 	Ferramentas utilizadas
 </h2>
 
-Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de desenvolvimento e outras para incorporar o projeto, são elas:
+Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de desenvolvimento, são elas:
+
+> Dependências
 
  - Bcryptjs
  - Bee-Queue
+ - Cors
  - Date-fns
  - Dotenv
  - Express
  - JsonWebToken
- - Mongoose
  - Nodemailer
+ - Multer
  - Postgrees
  - Sequelize
+ - Sentry
  - Youch
  - YUP
+ 
+> Dependências de desenvolvimento
+
+ - ESLint
+ - Factory Gril
+ - Faker
+ - Jest
+ - Nodemon
+ - Prettier
+ - Sucrase
+ - Supertest
+ - SQLite 
 
 <h2 align="center">
-	Executando o server
+	Executando a API
 </h2>
 
 Para executar o projeto basta clonar este repositório e abrir o PowerShell (ou outro terminal) na pasta raiz, feito isso execute o seguinte comando:
@@ -63,24 +78,30 @@ yarn dev
 O servidor já estará rodando, na URL http://localhost/3000
 
 <h2 align="center">
-	Middlewares
+	Testes automatizados
 </h2>
 
-- Validador verificando se existe um token no header das requisições e se o mesmo é válido
+A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo segue o gráfico do _codecoverage_ gerado pelo Jest:
+
+<p align="center">
+<img src="https://user-images.githubusercontent.com/7776944/79054712-9261cc00-7c1d-11ea-82fc-736f7bbe571d.png"/>
+</p>
+
+Para mais detalhes sobre os resultados dos testes, clique [aqui](https://htmlpreview.github.io/?https://github.com/jfelipearaujo/bootcamp-gostack-fastfeet-backend/blob/master/__tests__/coverage/lcov-report/index.html)
 
 <h2 align="center">
 	Testando a aplicação
 </h2>
 
-Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado na máquina os seguintes bancos de dados:
+Para testar a aplicação, será necessário realizar o clone do repositório e ter instalado em sua máquina os seguintes bancos de dados:
 
 - Postgres
-- MongoDB
 - Redis
 
 > É possível utilizar o Docker para a conteinerização das imagens dos bancos de dados
+> Lembre-se de modificar o arquivo de variáveis de ambiente
 
-Realize os testes através do Insomnia (certifique-se te tê-lo instalado em sua máquina):
+Realize os testes através do Insomnia com o link abaixo:
 
 <div align="center">
 <a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
