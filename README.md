@@ -13,9 +13,9 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 - Etapa 1: "FastFeet, o início" / clique <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-02/blob/master/README.md#desafio-02-iniciando-aplica%C3%A7%C3%A3o">aqui</a> para saber mais sobre esta etapa
 - Etapa 2: "FastFeet, continuando a aplicação" / clique <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-03/blob/master/README.md#desafio-03-continuando-aplica%C3%A7%C3%A3o">aqui</a> para saber mais sobre esta etapa
 
-<h3 align="center">
+<h2 align="center">
   Banco de dados
-</h3>
+</h2>
 
 Atualmente o sistema conta com os seguintes bancos de dados:
 
