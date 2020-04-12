@@ -81,6 +81,17 @@ O servidor já estará rodando, na URL http://localhost/3000
 	Testes automatizados
 </h2>
 
+<p align="center">
+  <strong>69.75%</strong> Statements |
+  <strong>58.6%</strong> Branches |
+  <strong>85.88%</strong> Functions |
+  <strong>71.78%</strong> Lines
+</p>
+
+<div align="center">
+
+</div>
+
 A API conta com testes automatizados para todas as rotas desenvolvidas, abaixo segue o gráfico do **_codecoverage_** gerado pelo Jest:
 
 <p align="center">
