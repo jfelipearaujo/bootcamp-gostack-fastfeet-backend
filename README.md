@@ -19,8 +19,8 @@ Para saber mais sobre o projeto, acesse os links abaixo:
 
 Atualmente o sistema conta com os seguintes bancos de dados:
 
-- Postgres
-- Redis
+- [Postgres](https://www.postgresql.org/)
+- [Redis](https://redis.io/)
 
 <h2 align="center">
 	Ferramentas utilizadas
@@ -30,32 +30,31 @@ Neste projeto foram utilizadas diversas ferramentas para ajudar no ambiente de d
 
 > Dependências
 
- - Bcryptjs
- - Bee-Queue
- - Cors
- - Date-fns
- - Dotenv
- - Express
- - JsonWebToken
- - Nodemailer
- - Multer
- - Postgrees
- - Sequelize
- - Sentry
- - Youch
- - YUP
+ - [bcryptjs](https://github.com/dcodeIO/bcrypt.js/)
+ - [bee-Queue](https://github.com/bee-queue/bee-queue)
+ - [cors](https://github.com/expressjs/cors)
+ - [date-fns](https://github.com/date-fns/date-fns)
+ - [dotenv](https://github.com/motdotla/dotenv)
+ - [express](https://github.com/expressjs/express)
+ - [JWT](https://github.com/auth0/node-jsonwebtoken)
+ - [Nodemailer](https://github.com/nodemailer/nodemailer)
+ - [Multer](https://github.com/expressjs/multer)
+ - [sequelize](https://github.com/sequelize/sequelize)
+ - [Sentry](https://sentry.io/welcome/)
+ - [Youch](https://github.com/poppinss/youch)
+ - [Yup](https://github.com/jquense/yup)
  
 > Dependências de desenvolvimento
 
- - ESLint
- - Factory Gril
- - Faker
- - Jest
- - Nodemon
- - Prettier
- - Sucrase
- - Supertest
- - SQLite 
+ - [ESLint](https://github.com/eslint/eslint)
+ - [Factory Girl](https://github.com/simonexmachina/factory-girl)
+ - [faker.js](https://github.com/marak/Faker.js/)
+ - [Jest](https://github.com/facebook/jest)
+ - [nodemon](https://github.com/remy/nodemon)
+ - [Prettier](https://github.com/prettier/prettier)
+ - [Sucrase](https://github.com/alangpierce/sucrase)
+ - [SuperTest](https://github.com/visionmedia/supertest)
+ - [SQLite](https://www.sqlite.org/index.html)
 
 <h2 align="center">
 	Executando a API
@@ -80,13 +79,6 @@ O servidor já estará rodando, na URL http://localhost/3000
 <h2 align="center">
 	Testes automatizados
 </h2>
-
-<p align="center">
-  <strong>69.75%</strong> Statements |
-  <strong>58.6%</strong> Branches |
-  <strong>85.88%</strong> Functions |
-  <strong>71.78%</strong> Lines
-</p>
 
 <div align="center">
 A API conta com testes automatizados através do framework Jest.
