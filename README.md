@@ -99,7 +99,7 @@ Para testar a aplicação, será necessário realizar o clone do repositório e 
 > É possível utilizar o Docker para a conteinerização das imagens dos bancos de dados
 > Lembre-se de modificar o arquivo de variáveis de ambiente
 
-Realize os testes através do Insomnia com o link abaixo:
+Realize os testes das rotas com o Insomnia através do link abaixo:
 
 <div align="center">
 <a href="https://insomnia.rest/run/?label=GoStack%20-%20FastFeet&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fjfelipearaujo%2Fbootcamp-gostack-fastfeet-backend%2Fmaster%2Fgostack_fastfeet_backend.json" target="_blank"><img src="https://insomnia.rest/images/run.svg" alt="Run in Insomnia"></a>
