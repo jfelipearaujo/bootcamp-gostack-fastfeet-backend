@@ -83,7 +83,7 @@ O servidor já estará rodando, na URL http://localhost/3000
 <div align="center">
 A API conta com testes automatizados através do framework Jest.
 
-Para analisar visualizar o **code coverage** completo, clique [aqui](https://htmlpreview.github.io/?https://github.com/jfelipearaujo/bootcamp-gostack-fastfeet-backend/blob/master/__tests__/coverage/lcov-report/index.html)
+Para visualizar o **code coverage** completo, clique [aqui](https://htmlpreview.github.io/?https://github.com/jfelipearaujo/bootcamp-gostack-fastfeet-backend/blob/master/__tests__/coverage/lcov-report/index.html)
 
 </div>
 
