@@ -33,6 +33,12 @@ const upload = multer(multerConfig);
 routes.post('/users', validateUserStore, UserController.store);
 routes.post('/sessions', validateSessionStore, SessionController.store);
 
+routes.get('/deliveryman/:id/deliveries', DeliveryController.index);
+routes.post('/deliveryman/:id/deliveries', DeliveryController.start);
+routes.put('/deliveryman/:id/deliveries', DeliveryController.finish);
+
+routes.post('/files', upload.single('file'), FileController.store);
+
 routes.use(authMiddleware);
 
 routes.put('/users', validateUserUpdate, UserController.update);
@@ -66,10 +72,6 @@ routes.post('/packages', validatePackageStore, PackageController.store);
 routes.put('/packages/:id', validatePackageUpdate, PackageController.update);
 routes.delete('/packages/:id', PackageController.delete);
 
-routes.get('/deliveryman/:deliverymanId/deliveries', DeliveryController.index);
-routes.post('/deliveryman/:deliverymanId/deliveries', DeliveryController.start);
-routes.put('/deliveryman/:deliverymanId/deliveries', DeliveryController.finish);
-
 routes.get('/delivery/problems', DeliveryProblemController.index);
 routes.get(
   '/delivery/:deliveryId/problems',
@@ -80,7 +82,5 @@ routes.delete(
   '/problem/:deliveryProblemId/cancel-delivery',
   DeliveryProblemController.delete
 );
-
-routes.post('/files', upload.single('file'), FileController.store);
 
 export default routes;

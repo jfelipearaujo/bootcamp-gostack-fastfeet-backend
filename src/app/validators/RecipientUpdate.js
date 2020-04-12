@@ -12,7 +12,6 @@ export default async (req, res, next) => {
         .max(2),
       city: Yup.string(),
       cep: Yup.string()
-        .required()
         .min(8)
         .max(8),
     });

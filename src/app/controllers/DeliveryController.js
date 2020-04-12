@@ -12,16 +12,7 @@ class DeliveryController {
    * List the deliveries of deliveryman
    */
   async index(req, res) {
-    const { deliveryman_id } = req.params.deliverymanId;
-    let { delivered = 0 } = req.query;
-
-    if (delivered !== 0 && delivered !== 1) {
-      delivered = 0;
-    }
-
-    if (!deliveryman_id) {
-      return res.status(400).json({ error: 'Deliveryman Id not provided' });
-    }
+    const deliveryman_id = req.params.id;
 
     const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
@@ -29,9 +20,12 @@ class DeliveryController {
       return res.status(404).json({ error: 'Deliveryman not found' });
     }
 
+    const { page = 1 } = req.query;
+    const { delivered = '0' } = req.query;
+
     let whereOptions;
 
-    if (delivered === 1) {
+    if (delivered === '1') {
       whereOptions = {
         deliveryman_id,
         canceled_at: null,
@@ -48,6 +42,8 @@ class DeliveryController {
     }
 
     const packages = await Package.findAll({
+      limit: 20,
+      offset: (page - 1) * 20,
       attributes: [
         'id',
         'product',
@@ -57,25 +53,34 @@ class DeliveryController {
         'recipient_id',
         'deliveryman_id',
         'signature_id',
+        'delivery_status',
       ],
       include: [
         {
           model: Recipient,
           as: 'recipient',
-          attributes: ['name', 'city', 'state'],
+          attributes: ['name', 'street', 'number', 'cep', 'city', 'state'],
         },
         {
           model: Deliveryman,
           as: 'deliveryman',
           attributes: ['name', 'email'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['path', 'url'],
+            },
+          ],
         },
         {
           model: File,
           as: 'signature',
-          attributes: ['name', 'path', 'url'],
+          attributes: ['path', 'url'],
         },
       ],
       where: whereOptions,
+      order: [['id', 'ASC']],
     });
 
     return res.json(packages);
@@ -85,7 +90,7 @@ class DeliveryController {
    * Start a delivery
    */
   async start(req, res) {
-    const { deliveryman_id } = req.params.deliverymanId;
+    const deliveryman_id = req.params.id;
     const { package_id } = req.body;
 
     try {
@@ -96,7 +101,7 @@ class DeliveryController {
 
       return res.json(packageData);
     } catch (err) {
-      return res.status(400).json({ error: err });
+      return res.status(400).json({ error: err.message });
     }
   }
 
@@ -104,7 +109,7 @@ class DeliveryController {
    * Finish a delivery
    */
   async finish(req, res) {
-    const { deliveryman_id } = req.params.deliverymanId;
+    const deliveryman_id = req.params.id;
     const { package_id, signature_id } = req.body;
 
     try {
@@ -116,7 +121,7 @@ class DeliveryController {
 
       return res.json(packageData);
     } catch (err) {
-      return res.status(400).json({ error: err });
+      return res.status(400).json({ error: err.message });
     }
   }
 }

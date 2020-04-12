@@ -83,6 +83,17 @@ describe('Deliveryman', () => {
     expect(response.body).toHaveProperty('id');
   });
 
+  it('should return validation error when try to create', async () => {
+    const response = await request(app)
+      .post('/deliveryman')
+      .send({
+        email: 'email@email.com',
+      })
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(400);
+  });
+
   it('should not create a deliveryman with an email thats already exists', async () => {
     let deliveryman = await factory.attrs('Deliveryman');
 
@@ -129,6 +140,30 @@ describe('Deliveryman', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
+  });
+
+  it('should return validation error when try to update', async () => {
+    let deliveryman = await factory.attrs('Deliveryman');
+
+    let response = await request(app)
+      .post('/deliveryman')
+      .send(deliveryman)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const { id } = response.body;
+
+    deliveryman = await factory.attrs('Deliveryman', {
+      email: 'jose@email',
+    });
+
+    response = await request(app)
+      .put(`/deliveryman/${id}`)
+      .send(deliveryman)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(400);
   });
 
   it('should not update a deliveryman thats not exists', async () => {
