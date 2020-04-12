@@ -16,7 +16,23 @@ class PackageController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { page = 1, product = '' } = req.query;
+    const { page = 1, p = '' } = req.query;
+
+    let whereConditional;
+
+    if (process.env.NODE_ENV === 'test') {
+      whereConditional = {
+        product: {
+          [Op.like]: `%${p}%`, // SQLite doesnt contains the 'iLike'
+        },
+      };
+    } else {
+      whereConditional = {
+        product: {
+          [Op.iLike]: `%${p}%`,
+        },
+      };
+    }
 
     const packages = await Package.findAll({
       limit: 20,
@@ -30,29 +46,34 @@ class PackageController {
         'recipient_id',
         'deliveryman_id',
         'signature_id',
+        'delivery_status',
       ],
       include: [
         {
           model: Recipient,
           as: 'recipient',
-          attributes: ['name', 'city', 'state'],
+          attributes: ['name', 'street', 'number', 'cep', 'city', 'state'],
         },
         {
           model: Deliveryman,
           as: 'deliveryman',
           attributes: ['name', 'email'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['path', 'url'],
+            },
+          ],
         },
         {
           model: File,
           as: 'signature',
-          attributes: ['name', 'path', 'url'],
+          attributes: ['path', 'url'],
         },
       ],
-      where: {
-        product: {
-          [Op.iLike]: `%${product}%`,
-        },
-      },
+      where: whereConditional,
+      order: [['id', 'ASC']],
     });
 
     return res.json(packages);
@@ -69,35 +90,34 @@ class PackageController {
     const { product, recipient_id, deliveryman_id } = req.body;
 
     // Check if the recipient exists
-    const recipient = await Recipient.findByPk({ where: recipient_id });
+    const recipient = await Recipient.findByPk(recipient_id);
 
     if (!recipient) {
       return res.status(404).json({ error: 'Recipient not found' });
     }
 
     // Check if the deliveryman exists
-    const deliveryman = await Deliveryman.findByPk({ where: deliveryman_id });
+    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
     if (!deliveryman) {
       return res.status(404).json({ error: 'Deliveryman not found' });
     }
 
-    const start_date = new Date();
-
     const { id } = await Package.create({
       product,
       recipient_id,
       deliveryman_id,
-      start_date,
     });
 
     // Send an e-mail to the deliveryman about the new package ready to delivery
-    await Queue.add(PackageMail.key, {
-      deliveryman,
-      product,
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      await Queue.add(PackageMail.key, {
+        deliveryman,
+        product,
+      });
+    }
 
-    return res.json({ id, product, recipient_id, deliveryman_id, start_date });
+    return res.json({ id, product, recipient_id, deliveryman_id });
   }
 
   /**
@@ -108,65 +128,39 @@ class PackageController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const {
-      package_id,
-      product = null,
-      recipient_id = null,
-      deliveryman_id = null,
-      canceled_at = null,
-      start_date = null,
-      end_date = null,
-    } = req.body;
+    const { id } = req.params;
 
-    const packageData = await Package.findByPk({ where: { id: package_id } });
+    const { recipient_id, deliveryman_id } = req.body;
+
+    const packageData = await Package.findByPk(id);
 
     if (!packageData) {
       return res.status(404).json({ error: 'Package not found' });
     }
 
     // Check if the user wants to change the recipient, if yes check if the recipient exists
-    if (packageData.recipient_id !== recipient_id) {
-      const recipient = await Recipient.findByPk({ where: recipient_id });
+    if (recipient_id && packageData.recipient_id !== recipient_id) {
+      const recipient = await Recipient.findByPk(recipient_id);
 
       if (!recipient) {
         return res.status(404).json({ error: 'New recipient not found' });
       }
     }
 
-    // Check if the user wants to change the deliveryman, if yes check if the recipient exists
-    if (packageData.deliveryman_id !== deliveryman_id) {
-      const deliveryman = await Deliveryman.findByPk({ where: deliveryman_id });
+    // Check if the user wants to change the deliveryman, if yes check if the deliveryman exists
+    if (deliveryman_id && packageData.deliveryman_id !== deliveryman_id) {
+      const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
       if (!deliveryman) {
         return res.status(404).json({ error: 'New deliveryman not found' });
       }
     }
 
-    await Package.update(
-      {
-        product: !product ? packageData.product : product,
-        recipient_id: !recipient_id ? packageData.recipient_id : recipient_id,
-        deliveryman_id: !deliveryman_id
-          ? packageData.deliveryman_id
-          : deliveryman_id,
-        canceled_at: !canceled_at ? packageData.canceled_at : canceled_at,
-        start_date: !start_date ? packageData.start_date : start_date,
-        end_date: !end_date ? packageData.end_date : end_date,
-      },
-      {
-        where: { id: package_id },
-      }
-    );
-
-    return res.json({
-      package_id,
-      product,
-      recipient_id,
-      deliveryman_id,
-      canceled_at,
-      start_date,
-      end_date,
+    const packageUpdated = await packageData.update(req.body, {
+      where: { id },
     });
+
+    return res.json(packageUpdated);
   }
 
   /**
@@ -177,19 +171,15 @@ class PackageController {
       return res.status(401).json({ error: 'Access denied' });
     }
 
-    const { package_id } = req.body;
+    const { id } = req.params;
 
-    if (!package_id) {
-      return res.status(400).json({ error: 'Package id not provided' });
-    }
-
-    const packageData = await Package.findByPk(package_id);
+    const packageData = await Package.findByPk(id);
 
     if (!packageData) {
       return res.status(404).json({ error: 'Package not found' });
     }
 
-    await Package.destroy({ where: { id: package_id } });
+    await Package.destroy({ where: { id } });
 
     return res.json({ ok: 'Package deleted' });
   }

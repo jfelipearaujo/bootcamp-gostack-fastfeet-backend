@@ -63,8 +63,8 @@ routes.delete('/deliveryman/:id', DeliverymanController.delete);
 
 routes.get('/packages', PackageController.index);
 routes.post('/packages', validatePackageStore, PackageController.store);
-routes.put('/packages', validatePackageUpdate, PackageController.update);
-routes.delete('/packages', PackageController.delete);
+routes.put('/packages/:id', validatePackageUpdate, PackageController.update);
+routes.delete('/packages/:id', PackageController.delete);
 
 routes.get('/deliveryman/:deliverymanId/deliveries', DeliveryController.index);
 routes.post('/deliveryman/:deliverymanId/deliveries', DeliveryController.start);
