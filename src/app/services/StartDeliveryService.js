@@ -23,7 +23,12 @@ class StartDeliveryService {
       throw new Error('Delivery already started');
     }
 
-    const today = new Date();
+    let today = new Date();
+
+    if (process.env.NODE_ENV === 'test') {
+      today = setSeconds(setMinutes(setHours(today, 12), 0), 0);
+    }
+
     const todayStartDay = setSeconds(setMinutes(setHours(today, 0), 0), 0);
     const todayStart = setSeconds(setMinutes(setHours(today, 8), 0), 0);
     const todayEnd = setSeconds(setMinutes(setHours(today, 18), 0), 0);

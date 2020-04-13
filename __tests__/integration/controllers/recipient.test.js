@@ -5,6 +5,7 @@ import factory from '../../factories';
 import truncate from '../../util/truncate';
 
 describe('Recipient', () => {
+  const baseUrl = '/recipients';
   let adminToken;
   let commonToken;
 
@@ -36,7 +37,7 @@ describe('Recipient', () => {
 
   it('should not allow to access a restricted get route', async () => {
     const response = await request(app)
-      .get('/recipients')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
@@ -46,7 +47,7 @@ describe('Recipient', () => {
     const recipient = await factory.attrs('Recipient');
 
     const response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${commonToken}`);
 
@@ -76,7 +77,7 @@ describe('Recipient', () => {
     const recipient = await factory.attrs('Recipient');
 
     const response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -87,7 +88,7 @@ describe('Recipient', () => {
     let recipient = await factory.attrs('Recipient');
 
     let response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -101,7 +102,7 @@ describe('Recipient', () => {
     });
 
     response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -112,7 +113,7 @@ describe('Recipient', () => {
     const recipient = await factory.attrs('Recipient');
 
     const response = await request(app)
-      .put('/recipients')
+      .put(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -123,7 +124,7 @@ describe('Recipient', () => {
     let recipient = await factory.attrs('Recipient');
 
     let response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -136,7 +137,7 @@ describe('Recipient', () => {
     recipient = await factory.attrs('Recipient');
 
     response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -159,7 +160,7 @@ describe('Recipient', () => {
     const recipient = await factory.attrs('Recipient');
 
     let response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -195,7 +196,7 @@ describe('Recipient', () => {
     const recipient = await factory.attrs('Recipient');
 
     let response = await request(app)
-      .post('/recipients')
+      .post(baseUrl)
       .send(recipient)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -225,7 +226,7 @@ describe('Recipient', () => {
 
     const promises = recipients.map(async recipient => {
       await request(app)
-        .post('/recipients')
+        .post(baseUrl)
         .send(recipient)
         .set('Authorization', `Bearer ${adminToken}`);
     });
@@ -233,7 +234,7 @@ describe('Recipient', () => {
     await Promise.all(promises);
 
     const response = await request(app)
-      .get('/recipients')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);

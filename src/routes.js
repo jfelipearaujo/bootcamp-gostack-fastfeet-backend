@@ -39,6 +39,12 @@ routes.put('/deliveryman/:id/deliveries', DeliveryController.finish);
 
 routes.post('/files', upload.single('file'), FileController.store);
 
+routes.post('/delivery/:deliveryId/problems', DeliveryProblemController.store);
+routes.get(
+  '/delivery/:deliveryId/problems',
+  DeliveryProblemController.delivery
+);
+
 routes.use(authMiddleware);
 
 routes.put('/users', validateUserUpdate, UserController.update);
@@ -73,11 +79,6 @@ routes.put('/packages/:id', validatePackageUpdate, PackageController.update);
 routes.delete('/packages/:id', PackageController.delete);
 
 routes.get('/delivery/problems', DeliveryProblemController.index);
-routes.get(
-  '/delivery/:deliveryId/problems',
-  DeliveryProblemController.delivery
-);
-routes.post('/delivery/:deliveryId/problems', DeliveryProblemController.store);
 routes.delete(
   '/problem/:deliveryProblemId/cancel-delivery',
   DeliveryProblemController.delete

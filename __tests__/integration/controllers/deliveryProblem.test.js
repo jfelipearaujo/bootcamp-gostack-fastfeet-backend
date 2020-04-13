@@ -2,12 +2,14 @@ import request from 'supertest';
 import app from '../../../src/app';
 
 import factory from '../../factories';
+import truncate from '../../util/truncate';
 
-describe('Delivery', () => {
+describe('DeliveryProblem', () => {
   let adminToken;
+  let commonToken;
 
   beforeAll(async () => {
-    const response = await request(app)
+    let response = await request(app)
       .post('/sessions')
       .send({
         email: 'admin@fastfeet.com',
@@ -15,17 +17,43 @@ describe('Delivery', () => {
       });
 
     adminToken = response.body.token;
+
+    //--
+
+    response = await request(app)
+      .post('/sessions')
+      .send({
+        email: 'jose@email.com',
+        password: '123456',
+      });
+
+    commonToken = response.body.token;
   });
 
-  it('should not return the deliveries with an deliveryman thats not exists', async () => {
-    const response = await request(app).get(`/deliveryman/${1}/deliveries`);
-
-    expect(response.status).toBe(404);
-    expect(response.body.error).toBe('Deliveryman not found');
+  beforeEach(async () => {
+    await truncate('DeliveryProblem');
   });
 
-  it('should return the deliveries', async () => {
+  it('should not access restricted get route', async () => {
+    const response = await request(app)
+      .get('/delivery/problems')
+      .set('Authorization', `Bearer ${commonToken}`);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('should not access restricted delete route', async () => {
+    const response = await request(app)
+      .delete('/problem/1/cancel-delivery')
+      .set('Authorization', `Bearer ${commonToken}`);
+
+    expect(response.status).toBe(401);
+  });
+
+  it('should return delivery problems', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -37,6 +65,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -48,70 +77,7 @@ describe('Delivery', () => {
 
     //----
 
-    const numOfEntities = 20;
-    const entities = await factory.attrsMany('Package', numOfEntities, {
-      recipient_id,
-      deliveryman_id,
-    });
-
-    const promises = entities.map(async entity => {
-      await request(app)
-        .post('/packages')
-        .send(entity)
-        .set('Authorization', `Bearer ${adminToken}`);
-    });
-
-    await Promise.all(promises);
-    // **** Arrange **** //
-
-    // **** Act **** //
-    response = await request(app).get(
-      `/deliveryman/${deliveryman_id}/deliveries`
-    );
-    // **** Act **** //
-
-    // **** Assert **** //
-    expect(response.status).toBe(200);
-    expect(response.body.length).toBe(numOfEntities);
-    // **** Assert **** //
-  });
-
-  it('should return only finished deliveries', async () => {
-    // **** Arrange **** //
-    let response = await request(app)
-      .post('/recipients')
-      .send(await factory.attrs('Recipient'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const recipient_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/deliveryman')
-      .send(await factory.attrs('Deliveryman'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const deliveryman_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/packages')
-      .send(
-        await factory.attrs('Package', {
-          recipient_id,
-          deliveryman_id,
-        })
-      )
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -126,37 +92,20 @@ describe('Delivery', () => {
 
     const package_id = response.body.id;
 
+    //----
+
+    // Create a delivery problem
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
-
-    expect(response.status).toBe(200);
-
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
 
     expect(response.status).toBe(200);
     // **** Arrange **** //
 
     // **** Act **** //
-    response = await request(app).get(
-      `/deliveryman/${deliveryman_id}/deliveries?delivered=1`
-    );
+    response = await request(app)
+      .get('/delivery/problems')
+      .set('Authorization', `Bearer ${adminToken}`);
     // **** Act **** //
 
     // **** Assert **** //
@@ -165,8 +114,10 @@ describe('Delivery', () => {
     // **** Assert **** //
   });
 
-  it('should start a delivery', async () => {
+  it('should return delivery problems from a specific delivery', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -178,6 +129,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -189,6 +141,130 @@ describe('Delivery', () => {
 
     //----
 
+    // Creathe the package
+    response = await request(app)
+      .post('/packages')
+      .send(
+        await factory.attrs('Package', {
+          recipient_id,
+          deliveryman_id,
+        })
+      )
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const package_id = response.body.id;
+
+    //----
+
+    // Create a delivery problem
+    response = await request(app)
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
+
+    expect(response.status).toBe(200);
+    // **** Arrange **** //
+
+    // **** Act **** //
+    response = await request(app).get(`/delivery/${package_id}/problems`);
+    // **** Act **** //
+
+    // **** Assert **** //
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBe(1);
+    // **** Assert **** //
+  });
+
+  it('should not return delivery problems from a delivery thats not exists', async () => {
+    // **** Arrange **** //
+
+    // Create the recipient
+    let response = await request(app)
+      .post('/recipients')
+      .send(await factory.attrs('Recipient'))
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const recipient_id = response.body.id;
+
+    //----
+
+    // Create the deliveryman
+    response = await request(app)
+      .post('/deliveryman')
+      .send(await factory.attrs('Deliveryman'))
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const deliveryman_id = response.body.id;
+
+    //----
+
+    // Creathe the package
+    response = await request(app)
+      .post('/packages')
+      .send(
+        await factory.attrs('Package', {
+          recipient_id,
+          deliveryman_id,
+        })
+      )
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const package_id = response.body.id;
+
+    //----
+
+    // Create a delivery problem
+    response = await request(app)
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
+
+    expect(response.status).toBe(200);
+    // **** Arrange **** //
+
+    // **** Act **** //
+    response = await request(app).get(`/delivery/${package_id + 1}/problems`);
+    // **** Act **** //
+
+    // **** Assert **** //
+    expect(response.status).toBe(404);
+    // **** Assert **** //
+  });
+
+  it('should create a delivery problems', async () => {
+    // **** Arrange **** //
+
+    // Create the recipient
+    let response = await request(app)
+      .post('/recipients')
+      .send(await factory.attrs('Recipient'))
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const recipient_id = response.body.id;
+
+    //----
+
+    // Create the deliveryman
+    response = await request(app)
+      .post('/deliveryman')
+      .send(await factory.attrs('Deliveryman'))
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(200);
+
+    const deliveryman_id = response.body.id;
+
+    //----
+
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -206,10 +282,8 @@ describe('Delivery', () => {
 
     // **** Act **** //
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
     // **** Act **** //
 
     // **** Assert **** //
@@ -217,8 +291,10 @@ describe('Delivery', () => {
     // **** Assert **** //
   });
 
-  it('should finish a delivery', async () => {
+  it('should not create a delivery problems without a description', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -230,6 +306,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -241,77 +318,7 @@ describe('Delivery', () => {
 
     //----
 
-    response = await request(app)
-      .post('/packages')
-      .send(
-        await factory.attrs('Package', {
-          recipient_id,
-          deliveryman_id,
-        })
-      )
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const package_id = response.body.id;
-
-    response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
-
-    expect(response.status).toBe(200);
-
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
-    // **** Arrange **** //
-
-    // **** Act **** //
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
-    // **** Act **** //
-
-    // **** Assert **** //
-    expect(response.status).toBe(200);
-    // **** Assert **** //
-  });
-
-  it('should not start a delivery when deliveryman is not found', async () => {
-    // **** Arrange **** //
-    let response = await request(app)
-      .post('/recipients')
-      .send(await factory.attrs('Recipient'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const recipient_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/deliveryman')
-      .send(await factory.attrs('Deliveryman'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const deliveryman_id = response.body.id;
-
-    //----
-
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -328,21 +335,18 @@ describe('Delivery', () => {
     // **** Arrange **** //
 
     // **** Act **** //
-    response = await request(app)
-      .post(`/deliveryman/${deliveryman_id + 1}/deliveries`)
-      .send({
-        package_id,
-      });
+    response = await request(app).post(`/delivery/${package_id}/problems`);
     // **** Act **** //
 
     // **** Assert **** //
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Deliveryman not found');
     // **** Assert **** //
   });
 
-  it('should not start a delivery when package is not found', async () => {
+  it('should not create a delivery problems from a delivery thats not exists', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -354,6 +358,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -365,6 +370,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -382,20 +388,19 @@ describe('Delivery', () => {
 
     // **** Act **** //
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id: package_id + 1,
-      });
+      .post(`/delivery/${package_id + 1}/problems`)
+      .send({ description: 'Deu problema' });
     // **** Act **** //
 
     // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Package not found');
+    expect(response.status).toBe(404);
     // **** Assert **** //
   });
 
-  it('should not start a delivery already started', async () => {
+  it('should cancel a delivery', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -407,6 +412,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -418,6 +424,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -433,30 +440,29 @@ describe('Delivery', () => {
     const package_id = response.body.id;
 
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
 
     expect(response.status).toBe(200);
+
+    const delivery_problem_id = response.body.id;
     // **** Arrange **** //
 
     // **** Act **** //
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
+      .delete(`/problem/${delivery_problem_id}/cancel-delivery`)
+      .set('Authorization', `Bearer ${adminToken}`);
     // **** Act **** //
 
     // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Delivery already started');
+    expect(response.status).toBe(200);
     // **** Assert **** //
   });
 
-  it('should not finish a delivery when deliveryman is not found', async () => {
+  it('should not cancel a delivery thats not exists', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -468,6 +474,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -479,6 +486,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -494,41 +502,29 @@ describe('Delivery', () => {
     const package_id = response.body.id;
 
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
 
     expect(response.status).toBe(200);
 
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
+    const delivery_problem_id = response.body.id;
     // **** Arrange **** //
 
     // **** Act **** //
     response = await request(app)
-      .put(`/deliveryman/${deliveryman_id + 1}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
+      .delete(`/problem/${delivery_problem_id + 1}/cancel-delivery`)
+      .set('Authorization', `Bearer ${adminToken}`);
     // **** Act **** //
 
     // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Deliveryman not found');
+    expect(response.status).toBe(404);
     // **** Assert **** //
   });
 
-  it('should not finish a delivery when signature is not found', async () => {
+  it('should not cancel a delivery thats been already cancelled', async () => {
     // **** Arrange **** //
+
+    // Create the recipient
     let response = await request(app)
       .post('/recipients')
       .send(await factory.attrs('Recipient'))
@@ -540,6 +536,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Create the deliveryman
     response = await request(app)
       .post('/deliveryman')
       .send(await factory.attrs('Deliveryman'))
@@ -551,6 +548,7 @@ describe('Delivery', () => {
 
     //----
 
+    // Creathe the package
     response = await request(app)
       .post('/packages')
       .send(
@@ -566,254 +564,28 @@ describe('Delivery', () => {
     const package_id = response.body.id;
 
     response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
+      .post(`/delivery/${package_id}/problems`)
+      .send({ description: 'Deu problema' });
 
     expect(response.status).toBe(200);
+
+    const delivery_problem_id = response.body.id;
 
     response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
+      .delete(`/problem/${delivery_problem_id}/cancel-delivery`)
+      .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
     // **** Arrange **** //
 
     // **** Act **** //
     response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id: signature_id + 1,
-      });
+      .delete(`/problem/${delivery_problem_id}/cancel-delivery`)
+      .set('Authorization', `Bearer ${adminToken}`);
     // **** Act **** //
 
     // **** Assert **** //
     expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Signature picture not found');
-    // **** Assert **** //
-  });
-
-  it('should not finish a delivery when package is not found', async () => {
-    // **** Arrange **** //
-    let response = await request(app)
-      .post('/recipients')
-      .send(await factory.attrs('Recipient'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const recipient_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/deliveryman')
-      .send(await factory.attrs('Deliveryman'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const deliveryman_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/packages')
-      .send(
-        await factory.attrs('Package', {
-          recipient_id,
-          deliveryman_id,
-        })
-      )
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const package_id = response.body.id;
-
-    response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
-
-    expect(response.status).toBe(200);
-
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
-    // **** Arrange **** //
-
-    // **** Act **** //
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id: package_id + 1,
-        signature_id,
-      });
-    // **** Act **** //
-
-    // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Package not found');
-    // **** Assert **** //
-  });
-
-  it('should not finish a delivery already finished', async () => {
-    // **** Arrange **** //
-    let response = await request(app)
-      .post('/recipients')
-      .send(await factory.attrs('Recipient'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const recipient_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/deliveryman')
-      .send(await factory.attrs('Deliveryman'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const deliveryman_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/packages')
-      .send(
-        await factory.attrs('Package', {
-          recipient_id,
-          deliveryman_id,
-        })
-      )
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const package_id = response.body.id;
-
-    response = await request(app)
-      .post(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-      });
-
-    expect(response.status).toBe(200);
-
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
-
-    expect(response.status).toBe(200);
-    // **** Arrange **** //
-
-    // **** Act **** //
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
-    // **** Act **** //
-
-    // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Delivery already finalized');
-    // **** Assert **** //
-  });
-
-  it('should not finish a non started delivery', async () => {
-    // **** Arrange **** //
-    let response = await request(app)
-      .post('/recipients')
-      .send(await factory.attrs('Recipient'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const recipient_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/deliveryman')
-      .send(await factory.attrs('Deliveryman'))
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const deliveryman_id = response.body.id;
-
-    //----
-
-    response = await request(app)
-      .post('/packages')
-      .send(
-        await factory.attrs('Package', {
-          recipient_id,
-          deliveryman_id,
-        })
-      )
-      .set('Authorization', `Bearer ${adminToken}`);
-
-    expect(response.status).toBe(200);
-
-    const package_id = response.body.id;
-
-    response = await request(app)
-      .post('/files')
-      .field('name', 'avatarImage')
-      .attach('file', `__tests__/fixtures/signature.png`);
-
-    expect(response.status).toBe(200);
-
-    const signature_id = response.body.id;
-
-    // **** Arrange **** //
-
-    // **** Act **** //
-    response = await request(app)
-      .put(`/deliveryman/${deliveryman_id}/deliveries`)
-      .send({
-        package_id,
-        signature_id,
-      });
-    // **** Act **** //
-
-    // **** Assert **** //
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe(
-      'Delivery not started - Impossible to finalize it'
-    );
     // **** Assert **** //
   });
 });

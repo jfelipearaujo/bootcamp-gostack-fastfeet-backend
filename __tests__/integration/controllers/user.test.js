@@ -6,6 +6,7 @@ import factory from '../../factories';
 import truncate from '../../util/truncate';
 
 describe('User', () => {
+  const baseUrl = '/users';
   const dummyUsers = 2; // This is used to represent the Admin and Common users created with Sequelize Seeder
   let adminToken;
   let commonToken;
@@ -48,7 +49,7 @@ describe('User', () => {
 
   it('should return validtion error when try to create an user', async () => {
     const response = await request(app)
-      .post('/users')
+      .post(baseUrl)
       .send({
         name: 'Teste',
         email: 'email@email.com',
@@ -61,7 +62,7 @@ describe('User', () => {
     const user = await factory.attrs('User');
 
     const response = await request(app)
-      .post('/users')
+      .post(baseUrl)
       .send(user);
 
     expect(response.body).toHaveProperty('id');
@@ -71,11 +72,11 @@ describe('User', () => {
     const user = await factory.attrs('User');
 
     await request(app)
-      .post('/users')
+      .post(baseUrl)
       .send(user);
 
     const response = await request(app)
-      .post('/users')
+      .post(baseUrl)
       .send(user);
 
     expect(response.status).toBe(400);
@@ -87,14 +88,14 @@ describe('User', () => {
 
     const promises = users.map(async user => {
       await request(app)
-        .post('/users')
+        .post(baseUrl)
         .send(user);
     });
 
     await Promise.all(promises);
 
     const response = await request(app)
-      .get('/users')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
@@ -103,7 +104,7 @@ describe('User', () => {
 
   it('should not allow a commom user to access a restricted route', async () => {
     const response = await request(app)
-      .get('/users')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
@@ -116,14 +117,14 @@ describe('User', () => {
 
     const promises = users.map(async user => {
       await request(app)
-        .post('/users')
+        .post(baseUrl)
         .send(user);
     });
 
     await Promise.all(promises);
 
     const response = await request(app)
-      .get('/users')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
@@ -134,7 +135,7 @@ describe('User', () => {
     const expectedUserName = 'Jose Felipe';
 
     const response = await request(app)
-      .put('/users')
+      .put(baseUrl)
       .send({
         name: expectedUserName,
         email: 'jose@email.com',
@@ -151,7 +152,7 @@ describe('User', () => {
     const expectedUserName = 'Jose Felipe';
 
     const response = await request(app)
-      .put('/users')
+      .put(baseUrl)
       .send({
         name: expectedUserName,
         email: 'jose@email.com',
@@ -165,7 +166,7 @@ describe('User', () => {
 
   it('should not be able to update an user with an existing email', async () => {
     const response = await request(app)
-      .put('/users')
+      .put(baseUrl)
       .send({
         email: 'admin@fastfeet.com',
         password: '123456',
@@ -178,7 +179,7 @@ describe('User', () => {
 
   it('should not be able to update an user with an incorrect old password', async () => {
     const response = await request(app)
-      .put('/users')
+      .put(baseUrl)
       .send({
         email: 'jose@email.com',
         oldPassword: '123456XX',
@@ -192,7 +193,7 @@ describe('User', () => {
 
   it('should not be able to update an user with an incorrect new password', async () => {
     const response = await request(app)
-      .put('/users')
+      .put(baseUrl)
       .send({
         email: 'jose@email.com',
         oldPassword: '123456',
@@ -206,7 +207,7 @@ describe('User', () => {
 
   it('should not be able to access the delete route if isnt an admin', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: 2,
       })
@@ -217,7 +218,7 @@ describe('User', () => {
 
   it('should not be able to delete if userId wasnt provided', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(400);
@@ -225,7 +226,7 @@ describe('User', () => {
 
   it('should not be able to delete a user that not exists', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: 5000,
       })
@@ -236,7 +237,7 @@ describe('User', () => {
 
   it('should not be able to delete himself', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: 1,
       })
@@ -249,11 +250,11 @@ describe('User', () => {
     const user = await factory.attrs('User');
 
     const response = await request(app)
-      .post('/users')
+      .post(baseUrl)
       .send(user);
 
     const deleteResponse = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: response.body.id,
       })
@@ -264,7 +265,7 @@ describe('User', () => {
 
   it('should return error when token is not provided', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: 1,
       });
@@ -274,7 +275,7 @@ describe('User', () => {
 
   it('should return error when token is invalid', async () => {
     const response = await request(app)
-      .delete('/users')
+      .delete(baseUrl)
       .send({
         user_id: 1,
       })

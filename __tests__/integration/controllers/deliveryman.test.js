@@ -5,6 +5,7 @@ import factory from '../../factories';
 import truncate from '../../util/truncate';
 
 describe('Deliveryman', () => {
+  const baseUrl = '/deliveryman';
   let adminToken;
   let commonToken;
 
@@ -36,7 +37,7 @@ describe('Deliveryman', () => {
 
   it('should not allow to access a restricted get route', async () => {
     const response = await request(app)
-      .get('/deliveryman')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${commonToken}`);
 
     expect(response.status).toBe(401);
@@ -46,7 +47,7 @@ describe('Deliveryman', () => {
     const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${commonToken}`);
 
@@ -76,7 +77,7 @@ describe('Deliveryman', () => {
     const deliveryman = await factory.attrs('Deliveryman');
 
     const response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -85,7 +86,7 @@ describe('Deliveryman', () => {
 
   it('should return validation error when try to create', async () => {
     const response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send({
         email: 'email@email.com',
       })
@@ -98,7 +99,7 @@ describe('Deliveryman', () => {
     let deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -111,7 +112,7 @@ describe('Deliveryman', () => {
     });
 
     response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -122,7 +123,7 @@ describe('Deliveryman', () => {
     let deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -146,7 +147,7 @@ describe('Deliveryman', () => {
     let deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -183,7 +184,7 @@ describe('Deliveryman', () => {
     });
 
     let response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -198,7 +199,7 @@ describe('Deliveryman', () => {
     });
 
     response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -220,7 +221,7 @@ describe('Deliveryman', () => {
     const deliveryman = await factory.attrs('Deliveryman');
 
     let response = await request(app)
-      .post('/deliveryman')
+      .post(baseUrl)
       .send(deliveryman)
       .set('Authorization', `Bearer ${adminToken}`);
 
@@ -250,7 +251,7 @@ describe('Deliveryman', () => {
 
     const promises = deliverymans.map(async entity => {
       await request(app)
-        .post('/deliveryman')
+        .post(baseUrl)
         .send(entity)
         .set('Authorization', `Bearer ${adminToken}`);
     });
@@ -258,7 +259,7 @@ describe('Deliveryman', () => {
     await Promise.all(promises);
 
     const response = await request(app)
-      .get('/deliveryman')
+      .get(baseUrl)
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);

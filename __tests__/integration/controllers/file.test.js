@@ -4,6 +4,8 @@ import app from '../../../src/app';
 import truncate from '../../util/truncate';
 
 describe('File', () => {
+  const baseUrl = '/files';
+
   beforeEach(async () => {
     await truncate('File');
   });
@@ -12,7 +14,7 @@ describe('File', () => {
     const imageName = 'avatar.jpg';
 
     const response = await request(app)
-      .post('/files')
+      .post(baseUrl)
       .field('name', 'avatarImage')
       .attach('file', `__tests__/fixtures/${imageName}`);
 

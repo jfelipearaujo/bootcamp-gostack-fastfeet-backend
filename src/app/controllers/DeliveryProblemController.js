@@ -29,14 +29,10 @@ class DeliveryProblemController {
   }
 
   /**
-   * List the delivery's details
+   * List the delivery's problems
    */
   async delivery(req, res) {
-    const { deliveryId } = req.params.deliveryId;
-
-    if (!deliveryId) {
-      return res.status(400).json({ error: 'Delivery Id not provided' });
-    }
+    const { deliveryId } = req.params;
 
     const delivery = await Package.findByPk(deliveryId);
 
@@ -54,7 +50,7 @@ class DeliveryProblemController {
         },
       ],
       where: {
-        id: delivery.id,
+        delivery_id: delivery.id,
       },
     });
 
@@ -65,49 +61,40 @@ class DeliveryProblemController {
    * Deliveryman is able to inform a delivery problem
    */
   async store(req, res) {
-    const { deliveryId } = req.params.deliveryId;
+    const { deliveryId } = req.params;
 
-    if (!deliveryId) {
-      return res.status(400).json({ error: 'Delivery Id not provided' });
-    }
-
-    const { package_id, description } = req.body;
-
-    if (!package_id) {
-      return res.status(400).json({ error: 'Package Id not provided' });
-    }
+    const { description } = req.body;
 
     if (!description) {
       return res.status(400).json({ error: 'Description not provided' });
     }
 
-    const packageData = await Package.findByPk(package_id);
+    const packageData = await Package.findByPk(deliveryId);
 
     if (!packageData) {
       return res.status(404).json({ error: 'Package not found' });
     }
 
-    const deliveryProblem = await DeliveryProblem.create({
-      delivery_id: package_id,
+    const { id, delivery_id } = await DeliveryProblem.create({
+      delivery_id: packageData.id,
       description,
     });
 
-    return res.json(deliveryProblem);
+    return res.json({ id, delivery_id, description });
   }
 
   /**
    * Cancel a delivery
    */
   async delete(req, res) {
-    const { deliveryProblemId } = req.params.deliveryProblemId;
-
-    if (!deliveryProblemId) {
-      return res
-        .status(400)
-        .json({ error: 'Delivery Problem Id not provided' });
+    if (!req.isAdmin) {
+      return res.status(401).json({ error: 'Access denied' });
     }
 
+    const { deliveryProblemId } = req.params;
+
     const deliveryProblem = await DeliveryProblem.findOne({
+      attributes: ['id', 'delivery_id', 'description'],
       where: { id: deliveryProblemId },
       include: [
         {
@@ -129,25 +116,28 @@ class DeliveryProblemController {
       return res.status(404).json({ error: 'Delivery Problem not found' });
     }
 
-    const packageData = await Package.findByPk(deliveryProblem.Package.id);
+    const packageData = await Package.findByPk(deliveryProblem.delivery.id);
 
-    if (!packageData) {
-      return res.status(404).json({ error: 'Package not found' });
+    const deliveryman = await Deliveryman.findByPk(packageData.deliveryman_id);
+
+    if (packageData.canceled_at !== null) {
+      return res.status(400).json({ error: 'Delivery already cancelled' });
     }
 
     packageData.canceled_at = new Date();
-    await packageData.save();
-
-    await DeliveryProblem.destroy({ where: { id: deliveryProblemId } });
 
     // Send an e-mail to the Deliveryman
-    await Queue.add(CancellationMail.key, {
-      name: deliveryProblem.Deliveryman.name,
-      email: deliveryProblem.Deliveryman.email,
-      product: deliveryProblem.Package.product,
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      await Queue.add(CancellationMail.key, {
+        name: deliveryman.name,
+        email: deliveryman.email,
+        product: packageData.product,
+      });
+    }
 
-    return res.json({ ok: 'Delivery Problem deleted' });
+    await packageData.save();
+
+    return res.json({ ok: 'Delivery cancelled' });
   }
 }
 
